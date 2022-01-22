@@ -8,6 +8,7 @@ public class GridMovementController : MonoBehaviour
     public Transform movePoint;
 
     public LayerMask whatStopMovement;
+    public BattleSystem battleSystem;
 
     // Start is called before the first frame update
     void Start()
@@ -18,6 +19,8 @@ public class GridMovementController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //if (battleSystem.GetState() != new PlayerTurn(battleSystem)) { return; }
+
         transform.position = Vector3.MoveTowards(transform.position, movePoint.position, moveSpeed * Time.deltaTime); ;
 
         if(Vector3.Distance(transform.position, movePoint.position) <= .5f)
@@ -27,6 +30,7 @@ public class GridMovementController : MonoBehaviour
                 if(!Physics2D.OverlapCircle(movePoint.position + new Vector3(Input.GetAxisRaw("Horizontal"), 0, 0), .2f, whatStopMovement))
                 {
                     movePoint.position += new Vector3(Input.GetAxisRaw("Horizontal"), 0, 0);
+                    battleSystem.SetState(new EnemyTurn(battleSystem));
                 }
             }
 
@@ -35,6 +39,7 @@ public class GridMovementController : MonoBehaviour
                 if (!Physics2D.OverlapCircle(movePoint.position + new Vector3(0, Input.GetAxisRaw("Vertical"), 0), .2f, whatStopMovement))
                 {
                     movePoint.position += new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
+                    battleSystem.SetState(new EnemyTurn(battleSystem));
                 }
             }
         }
