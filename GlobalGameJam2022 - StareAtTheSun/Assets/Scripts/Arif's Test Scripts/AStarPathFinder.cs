@@ -62,27 +62,32 @@ public class AStarPathFinder : MonoBehaviour
     bool done = false;
     
     //my codes
-    List<PathMarker> chosenPath = new List<PathMarker>();
+    public List<PathMarker> chosenPath = new List<PathMarker>();
+    public List<GameObject> chosenPathMarkers = new List<GameObject>();
+    public GameObject startNodeMarker;
+
     public GameObject enemy;
     public GameObject player;
-    int pathMarkerIndex = 1;
+    //int pathMarkerIndex = 1;
     bool startMoving = false;
 
     bool isPathCalculated = false;
 
     void RemoveAllMarkers()
     {
-        GameObject[] markers = GameObject.FindGameObjectsWithTag("Marker");
+        GameObject[] markers = GameObject.FindGameObjectsWithTag("Path");
         foreach(GameObject marker in markers)
         {
             Destroy(marker);
         }
     }
 
-    void BeginSearch()
+    public void BeginSearch()
     {
         done = false;
         RemoveAllMarkers();
+        chosenPath.Clear();
+        chosenPathMarkers.Clear();
 
         List<MapLocation> locations = new List<MapLocation>();
         for(int y = 1; y < maze.yMax - 1; y++)
@@ -94,11 +99,12 @@ public class AStarPathFinder : MonoBehaviour
 
         locations.Shuffle();
 
-        Vector2 startLocation = new Vector2(enemy.transform.position.x, enemy.transform.position.y);
+        Vector2 startLocation = new Vector2Int(Mathf.RoundToInt(enemy.transform.position.x), Mathf.RoundToInt(enemy.transform.position.y));
         startNode = new PathMarker(new MapLocation((int)enemy.transform.position.x, (int)enemy.transform.position.y), 0, 0, 0, Instantiate(start, startLocation, Quaternion.identity), null);
+        startNodeMarker = startNode.marker;
 
-        Vector2 goalLocation = new Vector2(player.transform.position.x , player.transform.position.y );
-        goalNode = new PathMarker(new MapLocation((int)player.transform.position.x, (int)player.transform.position.y), 0, 0, 0, Instantiate(end, goalLocation, Quaternion.identity), null);
+        Vector2 goalLocation = new Vector2Int(Mathf.RoundToInt(player.transform.position.x) , Mathf.RoundToInt(player.transform.position.y));
+        goalNode = new PathMarker(new MapLocation(Mathf.RoundToInt(player.transform.position.x), Mathf.RoundToInt(player.transform.position.y)), 0, 0, 0, Instantiate(end, goalLocation, Quaternion.identity), null);
 
         open.Clear();
         closed.Clear();
@@ -107,7 +113,7 @@ public class AStarPathFinder : MonoBehaviour
         lastPos = startNode;
     }
 
-    void Search(PathMarker thisNode)
+    public void Search(PathMarker thisNode)
     {
         if(thisNode.Equals(goalNode))
         {
@@ -193,69 +199,62 @@ public class AStarPathFinder : MonoBehaviour
         return false;
     }
 
-    void GetPath()
+    public void GetPath()
     {
         RemoveAllMarkers();
         PathMarker begin = lastPos;
 
         while(!startNode.Equals(begin) && begin != null)
         {
-            Instantiate(pathP, new Vector2(begin.location.x /** maze.scale*/, begin.location.y /** maze.scale*/), Quaternion.identity);
+            GameObject beginMarker = Instantiate(pathP, new Vector2(begin.location.x /** maze.scale*/, begin.location.y /** maze.scale*/), Quaternion.identity);
             begin = begin.parent;
             chosenPath.Add(begin);
+            chosenPathMarkers.Add(beginMarker);
         }
 
         chosenPath.Reverse();
+        chosenPathMarkers.Reverse();
         startMoving = true;
 
         Debug.Log(chosenPath.Count);
     }
 
-    void MoveEnemyAlongPath()
+    public bool IsStartMoving
     {
-        if (pathMarkerIndex < chosenPath.Count - 1)
+        get
         {
-            if (Vector2.Distance(enemy.transform.position, chosenPath[pathMarkerIndex].location.ToVector()) > 0.1f)
-            {
-                enemy.transform.position = Vector2.MoveTowards(enemy.transform.position, chosenPath[pathMarkerIndex].location.ToVector(), 0.1f);
-            }
-            else
-            {
-                    pathMarkerIndex++;
-            }
+            return startMoving;
         }
-        else
+        set
         {
-            enemy.transform.position = Vector2.MoveTowards(enemy.transform.position, player.transform.position, 0.1f);
+            startMoving = value;
         }
     }
 
-    private void Start()
+    public bool IsPathCalculated
     {
-        BeginSearch();
+        get
+        {
+            return isPathCalculated;
+        }
+        set
+        {
+            isPathCalculated = value;
+        }
     }
 
-    private void Update()
+    public PathMarker GetLastPos()
     {
-        if(!isPathCalculated)
-        {
-            Search(lastPos);
-        }
-        else
-        {
-            if(!startMoving)
-            {
-                GetPath();
-            }
-        }
+        return lastPos;
+    }
 
-        //if (Input.GetKeyDown(KeyCode.P)) BeginSearch();
-        //if (Input.GetKeyDown(KeyCode.C) && !done) Search(lastPos);
-        //if (Input.GetKeyDown(KeyCode.M)) GetPath();
+    public PathMarker GetStartNode()
+    {
+        return startNode;
+    }
 
-        if (startMoving)
-        {
-            MoveEnemyAlongPath();
-        }
+    public List<PathMarker> GetChosenPath()
+    {
+        return chosenPath;
     }
 }

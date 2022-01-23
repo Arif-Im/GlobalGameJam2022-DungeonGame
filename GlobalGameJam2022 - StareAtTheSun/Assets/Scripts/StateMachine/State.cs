@@ -5,6 +5,7 @@ using UnityEngine;
 public abstract class State
 {
     protected BattleSystem BattleSystem;
+    protected bool playOnce = false;
 
     public State(BattleSystem battleSystem)
     {

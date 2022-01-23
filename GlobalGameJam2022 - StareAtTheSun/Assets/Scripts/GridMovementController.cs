@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +11,8 @@ public class GridMovementController : MonoBehaviour
     public LayerMask whatStopMovement;
     public BattleSystem battleSystem;
 
+    public static event Action OnEnemyState;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -19,7 +22,7 @@ public class GridMovementController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (battleSystem.GetState() != new PlayerTurn(battleSystem)) { return; }
+        if (battleSystem.state != BattleState.PLAYERTURN) { return; }
 
         transform.position = Vector3.MoveTowards(transform.position, movePoint.position, moveSpeed * Time.deltaTime); ;
 
@@ -30,7 +33,7 @@ public class GridMovementController : MonoBehaviour
                 if(!Physics2D.OverlapCircle(movePoint.position + new Vector3(Input.GetAxisRaw("Horizontal"), 0, 0), .2f, whatStopMovement))
                 {
                     movePoint.position += new Vector3(Input.GetAxisRaw("Horizontal"), 0, 0);
-                    battleSystem.SetState(new EnemyTurn(battleSystem));
+                    OnEnemyState.Invoke();
                 }
             }
 
@@ -39,9 +42,15 @@ public class GridMovementController : MonoBehaviour
                 if (!Physics2D.OverlapCircle(movePoint.position + new Vector3(0, Input.GetAxisRaw("Vertical"), 0), .2f, whatStopMovement))
                 {
                     movePoint.position += new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
-                    battleSystem.SetState(new EnemyTurn(battleSystem));
+                    OnEnemyState.Invoke();
                 }
             }
+        }
+
+        if(Input.GetKeyDown(KeyCode.Q))
+        {
+            Debug.Log("Attack");
+            OnEnemyState.Invoke();
         }
     }
 }

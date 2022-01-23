@@ -10,7 +10,7 @@ public class Begin : State
 
     public override IEnumerator Start()
     {
-        Debug.Log("Start Game");
+        //Debug.Log("Start Game");
         yield return new WaitForSeconds(2);
         BattleSystem.SetState(new PlayerTurn(BattleSystem));
     }

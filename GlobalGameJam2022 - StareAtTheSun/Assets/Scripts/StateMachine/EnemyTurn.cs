@@ -9,16 +9,23 @@ public class EnemyTurn : State
 
     public override IEnumerator Start()
     {
-        Debug.Log("Enemy Turn");
-        yield return new WaitForSeconds(1);
-        BattleSystem.SetState(new PlayerTurn(BattleSystem));
+        if (!playOnce)
+        {
+            Debug.Log("Enemy Turn");
+            playOnce = true;
+        }
+
+
+        yield break;
+        //yield return new WaitForSeconds(0);
+        //BattleSystem.SetState(new PlayerTurn(BattleSystem));
     }
 
     public override IEnumerator Move()
     {
-        Debug.Log("Begin Move");
-        yield return new WaitForSeconds(1);
-        BattleSystem.SetState(new EnemyTurn(BattleSystem));
+        yield return new WaitForSeconds(0);
+
+        BattleSystem.SetState(new PlayerTurn(BattleSystem));
     }
 
     public override IEnumerator Attack()

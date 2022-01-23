@@ -9,7 +9,11 @@ public class PlayerTurn : State
 
     public override IEnumerator Start()
     {
-        Debug.Log("Player Turn");
+        if(!playOnce)
+        {
+            Debug.Log("Player Turn");
+            playOnce = true;
+        }
         yield break;
     }
 
