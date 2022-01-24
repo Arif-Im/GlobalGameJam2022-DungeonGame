@@ -10,5 +10,8 @@ public class Unit : MonoBehaviour
     public float maxHealth;
     public float currentHealth;
 
-    public float attackDamage;
+    public void TakeDamage(float damage)
+    {
+        currentHealth -= damage;
+    }
 }

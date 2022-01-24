@@ -2125,7 +2125,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1083975917}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 3, z: 0}
+  m_LocalPosition: {x: 2, y: 9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -3110,8 +3110,7 @@ MonoBehaviour:
   start: {fileID: 5898367301267455844, guid: e4a09dada0988064491d79abe5dd8f4d, type: 3}
   end: {fileID: 9051104231545655780, guid: be4bd6570dd407043a55fe18accbd1c2, type: 3}
   pathP: {fileID: 6414888557525876251, guid: ac0943cb780e4514bb7934f1138496da, type: 3}
-  chosenPathMarkers: []
-  startNodeMarker: {fileID: 0}
+  startNodeMarker: {x: 0, y: 0}
   enemy: {fileID: 1083975917}
   player: {fileID: 1971103181}
 --- !u!114 &1158264520

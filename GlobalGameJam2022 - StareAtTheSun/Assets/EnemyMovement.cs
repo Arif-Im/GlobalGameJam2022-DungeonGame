@@ -12,10 +12,10 @@ public class EnemyMovement : MonoBehaviour
 
     public AStarPathFinder pathFinder;
 
+    bool hasDoneBeginSearch = false;
 
     private void Awake()
     {
-        GridMovementController.OnEnemyState += EnemyState;
     }
 
     // Start is called before the first frame update
@@ -26,9 +26,27 @@ public class EnemyMovement : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
-        if(battleSystem.state != BattleState.ENEMYTURN) { return; }
+        if (battleSystem.state != BattleState.ENEMYTURN) { return; }
+
+        if(Vector2.Distance(transform.position, player.position) < 5)
+        {
+            GoToPlayer();
+        }
+        else
+        {
+            battleSystem.state = BattleState.PLAYERTURN;
+        }
+    }
+
+    private void GoToPlayer()
+    {
+        if(!hasDoneBeginSearch)
+        {
+            pathFinder.BeginSearch();
+            hasDoneBeginSearch = true;
+        }
 
         if (!pathFinder.IsPathCalculated)
         {
@@ -46,19 +64,15 @@ public class EnemyMovement : MonoBehaviour
         {
             MoveEnemyAlongPath();
         }
-
-        //if (pathFinder.IsStartMoving)
-        //{
-        //    MoveEnemyAlongPath();
-        //}
     }
+
     public void MoveEnemyAlongPath()
     {
-        Debug.Log("Enemy Move");
+        //Debug.Log("Enemy Move");
 
-        if(Vector2.Distance(transform.position, pathFinder.startNodeMarker.transform.position) < 1)
+        if(Vector2.Distance(transform.position, pathFinder.startNodeMarker) < 1)
         {
-            if (pathMarkerIndex <= pathFinder.GetChosenPath().Count - 1)
+            if (pathMarkerIndex < pathFinder.GetChosenPath().Count)
             {
                 if (Vector2.Distance(transform.position, pathFinder.GetChosenPath()[pathMarkerIndex].location.ToVector()) > 0.1f)
                 {
@@ -71,36 +85,22 @@ public class EnemyMovement : MonoBehaviour
             }
             else
             {
+                pathFinder.IsPathCalculated = false;
+                pathFinder.IsStartMoving = false;
+                hasDoneBeginSearch = false;
+                pathMarkerIndex = 1;
                 transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
                 battleSystem.state = BattleState.PLAYERTURN;
             }
         }
         else
         {
+            pathFinder.IsPathCalculated = false;
+            pathFinder.IsStartMoving = false;
+            hasDoneBeginSearch = false;
+            pathMarkerIndex = 1;
             transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
             battleSystem.state = BattleState.PLAYERTURN;
         }
-    }
-
-    void EnemyState()
-    {
-
-        Destroy(GameObject.Find("Start(Clone)"));
-        Destroy(GameObject.Find("End(Clone)"));
-
-        GameObject[] currentPaths = GameObject.FindGameObjectsWithTag("Path");
-        if (currentPaths.Length >= 1)
-        {
-            foreach (GameObject currentPath in currentPaths)
-            {
-                Destroy(currentPath);
-            }
-        }
-
-        battleSystem.state = BattleState.ENEMYTURN;
-        pathFinder.IsPathCalculated = false;
-        pathFinder.IsStartMoving = false;
-        pathMarkerIndex = 1;
-        pathFinder.BeginSearch();
     }
 }

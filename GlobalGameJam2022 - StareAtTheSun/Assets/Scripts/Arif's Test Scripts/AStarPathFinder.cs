@@ -13,6 +13,14 @@ public class PathMarker
     public GameObject marker;
     public PathMarker parent;
 
+    public PathMarker(MapLocation l, float g, float h, float f, PathMarker p)
+    {
+        location = l;
+        G = g;
+        H = h;
+        F = f;
+        parent = p;
+    }
 
     public PathMarker(MapLocation l, float g, float h, float f, GameObject marker, PathMarker p)
     {
@@ -63,14 +71,12 @@ public class AStarPathFinder : MonoBehaviour
     
     //my codes
     public List<PathMarker> chosenPath = new List<PathMarker>();
-    public List<GameObject> chosenPathMarkers = new List<GameObject>();
-    public GameObject startNodeMarker;
+    public Vector2 startNodeMarker;
 
     public GameObject enemy;
     public GameObject player;
-    //int pathMarkerIndex = 1;
-    bool startMoving = false;
 
+    bool startMoving = false;
     bool isPathCalculated = false;
 
     void RemoveAllMarkers()
@@ -87,7 +93,6 @@ public class AStarPathFinder : MonoBehaviour
         done = false;
         RemoveAllMarkers();
         chosenPath.Clear();
-        chosenPathMarkers.Clear();
 
         List<MapLocation> locations = new List<MapLocation>();
         for(int y = 1; y < maze.yMax - 1; y++)
@@ -99,12 +104,10 @@ public class AStarPathFinder : MonoBehaviour
 
         locations.Shuffle();
 
-        Vector2 startLocation = new Vector2Int(Mathf.RoundToInt(enemy.transform.position.x), Mathf.RoundToInt(enemy.transform.position.y));
-        startNode = new PathMarker(new MapLocation((int)enemy.transform.position.x, (int)enemy.transform.position.y), 0, 0, 0, Instantiate(start, startLocation, Quaternion.identity), null);
-        startNodeMarker = startNode.marker;
+        startNode = new PathMarker(new MapLocation((int)enemy.transform.position.x, (int)enemy.transform.position.y), 0, 0, 0, null);
+        startNodeMarker = startNode.location.ToVector();
 
-        Vector2 goalLocation = new Vector2Int(Mathf.RoundToInt(player.transform.position.x) , Mathf.RoundToInt(player.transform.position.y));
-        goalNode = new PathMarker(new MapLocation(Mathf.RoundToInt(player.transform.position.x), Mathf.RoundToInt(player.transform.position.y)), 0, 0, 0, Instantiate(end, goalLocation, Quaternion.identity), null);
+        goalNode = new PathMarker(new MapLocation(Mathf.RoundToInt(player.transform.position.x), Mathf.RoundToInt(player.transform.position.y)), 0, 0, 0, null);
 
         open.Clear();
         closed.Clear();
@@ -144,20 +147,14 @@ public class AStarPathFinder : MonoBehaviour
             float H = Vector2.Distance(neighbour.ToVector(), goalNode.location.ToVector());
             float F = G + H;
 
-            GameObject pathBlock = Instantiate(pathP, new Vector2(neighbour.x /** maze.scale*/, neighbour.y /** maze.scale*/), Quaternion.identity);
-
-            TextMesh[] values = pathBlock.GetComponentsInChildren<TextMesh>();
-            values[0].text = "G: " + G.ToString("0.00");
-            values[1].text = "H: " + H.ToString("0.00");
-            values[2].text = "F: " + F.ToString("0.00");
+            Vector2 pathVector = new Vector2(neighbour.x, neighbour.y);
 
             if (!UpdateMarker(neighbour, G,H,F,thisNode))
             {
-                open.Add(new PathMarker(neighbour, G, H, F, pathBlock, thisNode));
-                pathBlock.GetComponent<SpriteRenderer>().color = openColor;
+                open.Add(new PathMarker(neighbour, G, H, F, thisNode));
             }
 
-            if(Vector2.Distance(pathBlock.transform.position, player.transform.position) < 1)
+            if(Vector2.Distance(pathVector, player.transform.position) < 1)
             {
                 isPathCalculated = true;
             }
@@ -168,7 +165,6 @@ public class AStarPathFinder : MonoBehaviour
         closed.Add(pm);
 
         open.RemoveAt(0);
-        pm.marker.GetComponent<SpriteRenderer>().color = closedColor;
 
         lastPos = pm;
     }
@@ -201,19 +197,15 @@ public class AStarPathFinder : MonoBehaviour
 
     public void GetPath()
     {
-        RemoveAllMarkers();
         PathMarker begin = lastPos;
 
         while(!startNode.Equals(begin) && begin != null)
         {
-            GameObject beginMarker = Instantiate(pathP, new Vector2(begin.location.x /** maze.scale*/, begin.location.y /** maze.scale*/), Quaternion.identity);
             begin = begin.parent;
             chosenPath.Add(begin);
-            chosenPathMarkers.Add(beginMarker);
         }
 
         chosenPath.Reverse();
-        chosenPathMarkers.Reverse();
         startMoving = true;
 
         Debug.Log(chosenPath.Count);
