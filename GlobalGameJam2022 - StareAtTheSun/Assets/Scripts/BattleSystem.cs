@@ -9,13 +9,12 @@ public class BattleSystem : StateMachine
 {
     public BattleState state;
 
-
-    private void Start()
+    private void Awake()
     {
-        state = BattleState.PLAYERTURN;
+        
     }
 
-    public void EnemyTurn()
+    private void Start()
     {
         state = BattleState.PLAYERTURN;
     }
