@@ -2,40 +2,45 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class State
+public class State
 {
-    protected BattleSystem BattleSystem;
-    protected bool playOnce = false;
-
-    public State(BattleSystem battleSystem)
+    public enum STATE
     {
-        BattleSystem = battleSystem;
+        PLAYERTURN, ENEMYTURN
     }
 
-    public virtual IEnumerator Start()
+    public enum EVENT
     {
-        yield break;
+        ENTER, UPDATE, EXIT
     }
 
-    public virtual IEnumerator Move()
+    public STATE stateName;
+    protected EVENT stage;
+    protected Unit unit;
+    protected BattleSystem battleSystem;
+    protected State nextState;
+
+    public State(Unit _unit, BattleSystem _battleSystem)
     {
-        yield break;
+        unit = _unit;
+        battleSystem = _battleSystem;
+        stage = EVENT.ENTER;
     }
 
-    public virtual IEnumerator Attack()
+    public virtual void Enter() { stage = EVENT.UPDATE; }
+    public virtual void Update() { stage = EVENT.UPDATE; }
+
+    public virtual void Exit() { stage = EVENT.EXIT; }
+
+    public State Process()
     {
-        yield break;
-    }
-    public virtual IEnumerator Heal()
-    {
-        yield break;
-    }
-    public virtual IEnumerator Pause()
-    {
-        yield break;
-    }
-    public virtual IEnumerator Resume()
-    {
-        yield break;
+        if (stage == EVENT.ENTER) Enter();
+        if (stage == EVENT.UPDATE) Update();
+        if (stage == EVENT.EXIT)
+        {
+            Exit();
+            return nextState;
+        }
+        return this;
     }
 }

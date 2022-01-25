@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
 {
-    public int pathMarkerIndex = 1;
+    public int pathMarkerIndex = 0;
     Transform player;
 
     public BattleSystem battleSystem;
@@ -85,22 +85,23 @@ public class EnemyMovement : MonoBehaviour
             }
             else
             {
-                pathFinder.IsPathCalculated = false;
-                pathFinder.IsStartMoving = false;
-                hasDoneBeginSearch = false;
-                pathMarkerIndex = 1;
-                transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
+                ResetValues();
                 battleSystem.state = BattleState.PLAYERTURN;
             }
         }
         else
         {
-            pathFinder.IsPathCalculated = false;
-            pathFinder.IsStartMoving = false;
-            hasDoneBeginSearch = false;
-            pathMarkerIndex = 1;
-            transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
+            ResetValues();
             battleSystem.state = BattleState.PLAYERTURN;
         }
+    }
+
+    private void ResetValues()
+    {
+        pathFinder.IsPathCalculated = false;
+        pathFinder.IsStartMoving = false;
+        hasDoneBeginSearch = false;
+        pathMarkerIndex = 0;
+        transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
     }
 }

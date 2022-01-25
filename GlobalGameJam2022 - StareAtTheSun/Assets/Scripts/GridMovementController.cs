@@ -11,6 +11,8 @@ public class GridMovementController : MonoBehaviour
     public LayerMask whatStopMovement;
     public BattleSystem battleSystem;
 
+    public Vector2 dir;
+
     //public static event Action OnEnemyState;
 
     // Start is called before the first frame update
