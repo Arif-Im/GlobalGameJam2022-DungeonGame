@@ -68,8 +68,6 @@ public class EnemyMovement : MonoBehaviour
 
     public void MoveEnemyAlongPath()
     {
-        //Debug.Log("Enemy Move");
-
         if(Vector2.Distance(transform.position, pathFinder.startNodeMarker) < 1)
         {
             if (pathMarkerIndex < pathFinder.GetChosenPath().Count)

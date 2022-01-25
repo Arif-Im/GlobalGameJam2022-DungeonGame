@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Room : MonoBehaviour
 {
-    List<Enemy> listOfEnemies = new List<Enemy>();
+    List<Unit> listOfEnemies = new List<Unit>();
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -14,7 +14,7 @@ public class Room : MonoBehaviour
         }
     }
 
-    public List<Enemy> GetListOfEnemies()
+    public List<Unit> GetListOfEnemies()
     {
         return listOfEnemies;
     }

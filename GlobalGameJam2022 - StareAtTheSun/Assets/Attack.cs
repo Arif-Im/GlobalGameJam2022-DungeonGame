@@ -12,7 +12,7 @@ public class Attack : MonoBehaviour
     public float closeRange = 1;
     public float longRange = 3;
 
-    List<Enemy> listOfEnemies = new List<Enemy>();
+    List<Unit> listOfEnemies = new List<Unit>();
 
     Vector2 dir;
 
@@ -44,36 +44,77 @@ public class Attack : MonoBehaviour
 
     public void RoundAttack()
     {
+        GameObject blast = transform.Find("Blast").gameObject;
+        ParticleSystem blastPS = blast.GetComponent<ParticleSystem>();
+        blastPS.Play();
+
         Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(transform.position, surroundRange, whatIsEnemies);
         for (int i = 0; i < enemiesToDamage.Length; i++)
         {
             Debug.Log(enemiesToDamage[i].name);
-            enemiesToDamage[i].gameObject.GetComponent<Enemy>().TakeDamage(attackDamage);
+            enemiesToDamage[i].gameObject.GetComponent<Unit>().TakeDamage(attackDamage);
         }
     }
 
     public void ForwardAttack()
     {
+        GameObject bash = transform.Find("Bash").gameObject;
+        ForwardAttackAnim(bash);
+
         RaycastHit2D hitEnemy = Physics2D.Raycast(transform.position, dir, closeRange, whatIsEnemies);
 
         if (hitEnemy.collider != null)
         {
-            hitEnemy.transform.GetComponent<Enemy>().TakeDamage(attackDamage);
+            hitEnemy.transform.GetComponent<Unit>().TakeDamage(attackDamage);
         }
     }
+
     public void RangeAttack()
     {
+        GameObject flamethrower = transform.Find("Flamethrower").gameObject;
+        ForwardAttackAnim(flamethrower);
+
         RaycastHit2D hitEnemy = Physics2D.Raycast(transform.position, dir, longRange, whatIsEnemies);
 
         if (hitEnemy.collider != null)
         {
-            hitEnemy.transform.GetComponent<Enemy>().TakeDamage(attackDamage);
+            hitEnemy.transform.GetComponent<Unit>().TakeDamage(attackDamage);
+        }
+    }
+    private void ForwardAttackAnim(GameObject pFXGO)
+    {
+        GameObject bash = pFXGO;
+        ParticleSystem bashPS = bash.GetComponent<ParticleSystem>();
+
+        if (dir == Vector2.left)
+        {
+            bash.transform.rotation = Quaternion.Euler(0, -90, 0);
+            bashPS.Play();
+        }
+        else if (dir == Vector2.right)
+        {
+            bash.transform.rotation = Quaternion.Euler(180, -90, 0);
+            bashPS.Play();
+        }
+        else if (dir == Vector2.down)
+        {
+            bash.transform.rotation = Quaternion.Euler(90, -90, 0);
+            bashPS.Play();
+        }
+        else if (dir == Vector2.up)
+        {
+            bash.transform.rotation = Quaternion.Euler(-90, -90, 0);
+            bashPS.Play();
         }
     }
 
     public void AreaAttack()
     {
-        foreach(Enemy enemy in listOfEnemies)
+        GameObject blizzard = transform.Find("Blizzard").gameObject;
+        ParticleSystem blizzardPS = blizzard.GetComponent<ParticleSystem>();
+        blizzardPS.Play();
+
+        foreach (Enemy enemy in listOfEnemies)
         {
             enemy.TakeDamage(attackDamage);
         }

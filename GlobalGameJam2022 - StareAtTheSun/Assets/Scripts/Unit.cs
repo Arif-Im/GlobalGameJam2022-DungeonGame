@@ -12,6 +12,11 @@ public class Unit : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        transform.Find("Blood").GetComponent<ParticleSystem>().Play();
         currentHealth -= damage;
+        if (currentHealth <= 0)
+        {
+            Destroy(this.gameObject);
+        }
     }
 }

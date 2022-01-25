@@ -79,6 +79,8 @@ public class AStarPathFinder : MonoBehaviour
     bool startMoving = false;
     bool isPathCalculated = false;
 
+    int noOfPath = 0;
+
     void RemoveAllMarkers()
     {
         GameObject[] markers = GameObject.FindGameObjectsWithTag("Path");
@@ -124,39 +126,42 @@ public class AStarPathFinder : MonoBehaviour
             return;
         }
 
-        foreach(MapLocation dir in maze.directions)
+        if(noOfPath > 2)
         {
-            MapLocation neighbour = dir + thisNode.location;
-
-            if(maze.map[neighbour.x, neighbour.y] == 1)
+            foreach (MapLocation dir in maze.directions)
             {
-                continue;
-            }
+                MapLocation neighbour = dir + thisNode.location;
 
-            if (neighbour.x < 1 || neighbour.x >= maze.xMax || neighbour.y < 1 || neighbour.y >= maze.yMax)
-            {
-                continue;
-            }
+                if (maze.map[neighbour.x, neighbour.y] == 1)
+                {
+                    continue;
+                }
 
-            if (IsClosed(neighbour))
-            {
-                continue;
-            }
+                if (neighbour.x < 1 || neighbour.x >= maze.xMax || neighbour.y < 1 || neighbour.y >= maze.yMax)
+                {
+                    continue;
+                }
 
-            float G = Vector2.Distance(thisNode.location.ToVector(), neighbour.ToVector()) + thisNode.G;
-            float H = Vector2.Distance(neighbour.ToVector(), goalNode.location.ToVector());
-            float F = G + H;
+                if (IsClosed(neighbour))
+                {
+                    continue;
+                }
 
-            Vector2 pathVector = new Vector2(neighbour.x, neighbour.y);
+                float G = Vector2.Distance(thisNode.location.ToVector(), neighbour.ToVector()) + thisNode.G;
+                float H = Vector2.Distance(neighbour.ToVector(), goalNode.location.ToVector());
+                float F = G + H;
 
-            if (!UpdateMarker(neighbour, G,H,F,thisNode))
-            {
-                open.Add(new PathMarker(neighbour, G, H, F, thisNode));
-            }
+                Vector2 pathVector = new Vector2(neighbour.x, neighbour.y);
 
-            if(Vector2.Distance(pathVector, player.transform.position) < 1)
-            {
-                isPathCalculated = true;
+                if (!UpdateMarker(neighbour, G, H, F, thisNode))
+                {
+                    open.Add(new PathMarker(neighbour, G, H, F, thisNode));
+                }
+
+                if (Vector2.Distance(pathVector, player.transform.position) < 1)
+                {
+                    isPathCalculated = true;
+                }
             }
         }
 
