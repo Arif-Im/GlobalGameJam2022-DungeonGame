@@ -10,6 +10,8 @@ public class GridMovementController : MonoBehaviour
 
     public LayerMask whatStopMovement;
     public BattleSystem battleSystem;
+
+    AnimationManager animationManager;
     Unit unit;
 
     public Vector2 dir;
@@ -20,15 +22,36 @@ public class GridMovementController : MonoBehaviour
     void Start()
     {
         unit = transform.GetComponent<Unit>();
+        animationManager = GetComponent<AnimationManager>();
         movePoint.parent = null;
+    }
+
+    private void Update()
+    {
+        if (Input.GetAxisRaw("Horizontal") < 0)
+        {
+            animationManager.ChangeAnimationState(AnimationManager.Animations.LEFTWALK);
+        }
+        else if (Input.GetAxisRaw("Horizontal") > 0)
+        {
+            animationManager.ChangeAnimationState(AnimationManager.Animations.RIGHTWALK);
+        }
+        else if (Input.GetAxisRaw("Vertical") < 0)
+        {
+            animationManager.ChangeAnimationState(AnimationManager.Animations.DOWNWALK);
+        }
+        else if (Input.GetAxisRaw("Vertical") > 0)
+        {
+            animationManager.ChangeAnimationState(AnimationManager.Animations.UPWALK);
+        }
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
-        if (!unit.isCurrentTurn) { return; }
-
         transform.position = Vector3.MoveTowards(transform.position, movePoint.position, moveSpeed * Time.deltaTime);
+
+        if (!unit.isCurrentTurn) { return; }
 
         if(Vector3.Distance(transform.position, movePoint.position) <= .5f)
         {
@@ -49,5 +72,12 @@ public class GridMovementController : MonoBehaviour
                 }
             }
         }
+        //else
+        //{
+        //    if(Vector3.Distance(transform.position, movePoint.position) <= .5f)
+        //    {
+        //        battleSystem.ChangeTurn(this.unit);
+        //    }
+        //}
     }
 }

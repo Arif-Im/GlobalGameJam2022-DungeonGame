@@ -12,11 +12,11 @@ public class Unit : MonoBehaviour
     public float maxHealth;
     public float currentHealth;
 
-    BattleSystem battleSystem;
+    protected BattleSystem battleSystem;
 
     public bool isCurrentTurn = false;
 
-    private void Start()
+    public void Start()
     {
         battleSystem = FindObjectOfType<BattleSystem>();
     }
