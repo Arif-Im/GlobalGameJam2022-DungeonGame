@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Marker
   - Path
+  - BattleSystem
   layers:
   - Default
   - TransparentFX

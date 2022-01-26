@@ -67,17 +67,14 @@ public class AStarPathFinder : MonoBehaviour
     PathMarker startNode;
 
     PathMarker lastPos;
-    bool done = false;
     
     //my codes
     public List<PathMarker> chosenPath = new List<PathMarker>();
     public Vector2 startNodeMarker;
 
-    public GameObject enemy;
-    public GameObject player;
-
     bool startMoving = false;
     bool isPathCalculated = false;
+    bool hasDoneBeginSearch = false;
 
     int noOfPath = 0;
 
@@ -90,15 +87,14 @@ public class AStarPathFinder : MonoBehaviour
         }
     }
 
-    public void BeginSearch()
+    public void BeginSearch(GameObject enemy, GameObject player)
     {
-        done = false;
         RemoveAllMarkers();
-        chosenPath.Clear();
+        //chosenPath.Clear();
 
         List<MapLocation> locations = new List<MapLocation>();
-        for(int y = 1; y < maze.yMax - 1; y++)
-            for(int x = 1; x < maze.xMax - 1;x++)
+        for (int y = 1; y < maze.yMax - 1; y++)
+            for (int x = 1; x < maze.xMax - 1; x++)
             {
                 if (maze.map[x, y] != 1)
                     locations.Add(new MapLocation(x, y));
@@ -122,12 +118,19 @@ public class AStarPathFinder : MonoBehaviour
     {
         if(thisNode.Equals(goalNode))
         {
-            done = true;
             return;
         }
 
-        if(noOfPath > 2)
+        if (noOfPath > 5)
         {
+            Debug.Log($"No of Path: {noOfPath}");
+            noOfPath = 0;
+            isPathCalculated = true;
+            GetPath();
+        }
+        else
+        {
+            Debug.Log("Creating new neighbours");
             foreach (MapLocation dir in maze.directions)
             {
                 MapLocation neighbour = dir + thisNode.location;
@@ -155,23 +158,21 @@ public class AStarPathFinder : MonoBehaviour
 
                 if (!UpdateMarker(neighbour, G, H, F, thisNode))
                 {
+                    Debug.Log("Adding neighbours to open");
                     open.Add(new PathMarker(neighbour, G, H, F, thisNode));
-                }
-
-                if (Vector2.Distance(pathVector, player.transform.position) < 1)
-                {
-                    isPathCalculated = true;
+                    Debug.Log($"Open Neighbour Count = {open.Count}");
                 }
             }
+
+            open = open.OrderBy(p => p.F).ToList<PathMarker>();
+            PathMarker pm = (PathMarker)open.ElementAt(0);
+            closed.Add(pm);
+
+            open.RemoveAt(0);
+
+            lastPos = pm;
+            noOfPath++;
         }
-
-        open = open.OrderBy(p => p.F).ToList<PathMarker>();
-        PathMarker pm = (PathMarker)open.ElementAt(0);
-        closed.Add(pm);
-
-        open.RemoveAt(0);
-
-        lastPos = pm;
     }
 
     private bool UpdateMarker(MapLocation pos, float g, float h, float f, PathMarker prt)
@@ -204,16 +205,23 @@ public class AStarPathFinder : MonoBehaviour
     {
         PathMarker begin = lastPos;
 
-        while(!startNode.Equals(begin) && begin != null)
+        while (!startNode.Equals(begin) && begin != null)
         {
             begin = begin.parent;
             chosenPath.Add(begin);
         }
 
         chosenPath.Reverse();
-        startMoving = true;
 
-        Debug.Log(chosenPath.Count);
+        Debug.Log($"Chosen Path Count: {chosenPath.Count}");
+        IsStartMoving = true;
+    }
+
+    public void ResetValues()
+    {
+        chosenPath.Clear();
+        IsPathCalculated = false;
+        IsStartMoving = false;
     }
 
     public bool IsStartMoving

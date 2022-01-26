@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Attack : MonoBehaviour
 {
-    public BattleSystem battleSystem;
     public float attackDamage;
 
     public LayerMask whatIsEnemies;
@@ -12,16 +11,24 @@ public class Attack : MonoBehaviour
     public float closeRange = 1;
     public float longRange = 3;
 
+    BattleSystem battleSystem;
+    Unit unit;
+
     List<Unit> listOfEnemies = new List<Unit>();
 
     Vector2 dir;
+
+    private void Start()
+    {
+        battleSystem = FindObjectOfType<BattleSystem>();
+        unit = GetComponent<Unit>();
+    }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
             Debug.Log("Attack");
-            battleSystem.state = BattleState.ENEMYTURN;
         }
 
         if (Input.GetAxisRaw("Horizontal") < 0)
@@ -54,6 +61,7 @@ public class Attack : MonoBehaviour
             Debug.Log(enemiesToDamage[i].name);
             enemiesToDamage[i].gameObject.GetComponent<Unit>().TakeDamage(attackDamage);
         }
+        battleSystem.ChangeTurn(unit);
     }
 
     public void ForwardAttack()
@@ -67,6 +75,7 @@ public class Attack : MonoBehaviour
         {
             hitEnemy.transform.GetComponent<Unit>().TakeDamage(attackDamage);
         }
+        battleSystem.ChangeTurn(unit);
     }
 
     public void RangeAttack()
@@ -80,6 +89,7 @@ public class Attack : MonoBehaviour
         {
             hitEnemy.transform.GetComponent<Unit>().TakeDamage(attackDamage);
         }
+        battleSystem.ChangeTurn(unit);
     }
     private void ForwardAttackAnim(GameObject pFXGO)
     {
@@ -118,6 +128,7 @@ public class Attack : MonoBehaviour
         {
             enemy.TakeDamage(attackDamage);
         }
+        battleSystem.ChangeTurn(unit);
     }
 
     void OnDrawGizmosSelected()

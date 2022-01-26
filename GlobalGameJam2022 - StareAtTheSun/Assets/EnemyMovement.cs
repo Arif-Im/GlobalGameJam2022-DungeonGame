@@ -8,53 +8,54 @@ public class EnemyMovement : MonoBehaviour
     public int pathMarkerIndex = 0;
     Transform player;
 
-    public BattleSystem battleSystem;
+    BattleSystem battleSystem;
+    AStarPathFinder pathFinder;
+    Unit unit;
 
-    public AStarPathFinder pathFinder;
-
-    bool hasDoneBeginSearch = false;
-
-    private void Awake()
-    {
-    }
+    public bool hasDoneBeginSearch = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        pathFinder.BeginSearch();
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        battleSystem = FindObjectOfType<BattleSystem>();
+        unit = transform.GetComponent<Unit>();
+        pathFinder = GetComponent<EnemyAI>().pathFinder;
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
-        if (battleSystem.state != BattleState.ENEMYTURN) { return; }
+        //if (!unit.isCurrentTurn) { return; }
 
-        if(Vector2.Distance(transform.position, player.position) < 5)
-        {
-            GoToPlayer();
-        }
-        else
-        {
-            battleSystem.state = BattleState.PLAYERTURN;
-        }
+        //if (Vector2.Distance(player.transform.position, transform.position) < 2)
+        //{
+        //    Debug.Log("Enemy Attacks!");
+        //    transform.Find("Blast").GetComponent<ParticleSystem>().Play();
+        //    battleSystem.ChangeTurn(unit);
+        //}
+        //else
+        //{
+        //    GoToPlayer();
+        //}
     }
 
     private void GoToPlayer()
     {
         if(!hasDoneBeginSearch)
         {
-            pathFinder.BeginSearch();
+            Debug.Log("Has Done Begin Search = false");
+            pathFinder.BeginSearch(this.gameObject, player.gameObject);
             hasDoneBeginSearch = true;
         }
 
-        if (!pathFinder.IsPathCalculated)
+        if(!pathFinder.IsPathCalculated)
         {
             pathFinder.Search(pathFinder.GetLastPos());
         }
         else
         {
-            if (!pathFinder.IsStartMoving)
+            if(!pathFinder.IsStartMoving)
             {
                 pathFinder.GetPath();
             }
@@ -62,6 +63,7 @@ public class EnemyMovement : MonoBehaviour
 
         if (pathFinder.IsStartMoving)
         {
+            Debug.Log("Moving");
             MoveEnemyAlongPath();
         }
     }
@@ -83,21 +85,21 @@ public class EnemyMovement : MonoBehaviour
             }
             else
             {
-                ResetValues();
-                battleSystem.state = BattleState.PLAYERTURN;
+                //ResetValues();
+                battleSystem.ChangeTurn(this.unit);
             }
         }
         else
         {
-            ResetValues();
-            battleSystem.state = BattleState.PLAYERTURN;
+            //ResetValues();
+            battleSystem.ChangeTurn(this.unit);
         }
     }
 
-    private void ResetValues()
+    public void ResetValues()
     {
-        pathFinder.IsPathCalculated = false;
-        pathFinder.IsStartMoving = false;
+        Debug.Log("Has Reset Values");
+        pathFinder.ResetValues();
         hasDoneBeginSearch = false;
         pathMarkerIndex = 0;
         transform.position = new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.y));
