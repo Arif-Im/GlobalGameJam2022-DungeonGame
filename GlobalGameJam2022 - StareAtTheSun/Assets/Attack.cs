@@ -51,6 +51,8 @@ public class Attack : MonoBehaviour
 
     public void RoundAttack()
     {
+        if(!unit.isCurrentTurn) { return; }
+
         GameObject blast = transform.Find("Blast").gameObject;
         ParticleSystem blastPS = blast.GetComponent<ParticleSystem>();
         blastPS.Play();
@@ -66,6 +68,7 @@ public class Attack : MonoBehaviour
 
     public void ForwardAttack()
     {
+        if (!unit.isCurrentTurn) { return; }
         GameObject bash = transform.Find("Bash").gameObject;
         ForwardAttackAnim(bash);
 
@@ -80,6 +83,7 @@ public class Attack : MonoBehaviour
 
     public void RangeAttack()
     {
+        if (!unit.isCurrentTurn) { return; }
         GameObject flamethrower = transform.Find("Flamethrower").gameObject;
         ForwardAttackAnim(flamethrower);
 
@@ -88,6 +92,20 @@ public class Attack : MonoBehaviour
         if (hitEnemy.collider != null)
         {
             hitEnemy.transform.GetComponent<Unit>().TakeDamage(attackDamage);
+        }
+        battleSystem.ChangeTurn(unit);
+    }
+
+    public void AreaAttack()
+    {
+        if (!unit.isCurrentTurn) { return; }
+        GameObject blizzard = transform.Find("Blizzard").gameObject;
+        ParticleSystem blizzardPS = blizzard.GetComponent<ParticleSystem>();
+        blizzardPS.Play();
+
+        foreach (Enemy enemy in listOfEnemies)
+        {
+            enemy.TakeDamage(attackDamage);
         }
         battleSystem.ChangeTurn(unit);
     }
@@ -116,18 +134,6 @@ public class Attack : MonoBehaviour
             bash.transform.rotation = Quaternion.Euler(-90, -90, 0);
             bashPS.Play();
         }
-    }
-
-    public void AreaAttack()
-    {
-        GameObject blizzard = transform.Find("Blizzard").gameObject;
-        ParticleSystem blizzardPS = blizzard.GetComponent<ParticleSystem>();
-        blizzardPS.Play();
-
-        foreach (Enemy enemy in listOfEnemies)
-        {
-            enemy.TakeDamage(attackDamage);
-        }
         battleSystem.ChangeTurn(unit);
     }
 
@@ -143,7 +149,7 @@ public class Attack : MonoBehaviour
         Gizmos.DrawLine(transform.position, (Vector2)transform.position + (dir * longRange));
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
         if (collision.gameObject.GetComponent<Room>())
         {
