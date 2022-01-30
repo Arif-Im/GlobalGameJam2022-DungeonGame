@@ -21,7 +21,7 @@ public class Unit : MonoBehaviour
         battleSystem = FindObjectOfType<BattleSystem>();
     }
 
-    public void TakeDamage(float damage)
+    public virtual void TakeDamage(float damage)
     {
         transform.Find("Blood").GetComponent<ParticleSystem>().Play();
         currentHealth -= damage;

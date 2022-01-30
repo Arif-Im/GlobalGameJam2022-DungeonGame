@@ -29,7 +29,7 @@ public class EnemyMovement : MonoBehaviour
             {
                 if (Vector2.Distance(transform.position, pathFinder.GetChosenPath()[pathMarkerIndex].location.ToVector()) > 0.1f)
                 {
-                    transform.position = Vector2.MoveTowards(transform.position, pathFinder.GetChosenPath()[pathMarkerIndex].location.ToVector(), 10);
+                    transform.position = Vector2.MoveTowards(transform.position, pathFinder.GetChosenPath()[pathMarkerIndex].location.ToVector(), 1000 * Time.deltaTime);
                 }
                 else
                 {
